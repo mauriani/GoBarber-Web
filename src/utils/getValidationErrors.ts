@@ -1,5 +1,6 @@
 import { ValidationError } from 'yup';
 
+// assim retorna um objeto string na chave e no valor
 interface Errors {
   [key: string]: string;
 }

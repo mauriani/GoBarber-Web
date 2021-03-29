@@ -30,7 +30,7 @@ const SignUp: React.FC = () => {
           .email('Digite um e-mail válido'),
         password: Yup.string().min(6, 'Mínimo seis caracteres'),
       });
-
+      // esse abortEarly retorna todos os erros que ele encontra e nao o primeiro erro que encontar
       await schema.validate(data, { abortEarly: false });
     } catch (err) {
       const errors = getValidationErros(err);
