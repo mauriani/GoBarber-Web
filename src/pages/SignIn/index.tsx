@@ -1,9 +1,9 @@
-import React, { useCallback, useRef, useContext } from 'react';
+import React, { useCallback, useRef } from 'react';
 import { FiLogIn, FiMail, FiLock } from 'react-icons/fi';
 import { FormHandles } from '@unform/core';
 import { Form } from '@unform/web';
 import * as Yup from 'yup';
-import { AuthContext, AuthProvider } from '../../context/AuthContext';
+import { useAuth } from '../../context/AuthContext';
 import getValidationErros from '../../utils/getValidationErrors';
 
 import Button from '../../components/Button';
@@ -20,8 +20,11 @@ interface SignInForm {
 const SignIn: React.FC = () => {
   const formRef = useRef<FormHandles>(null);
 
-  const { signIn } = useContext(AuthContext);
+  const { user, signIn } = useAuth();
 
+  console.log(user);
+
+  // validação de dados, chama a função de signIn passando os campos para realizar auth
   const handleSubmit = useCallback(
     async (data: SignInForm) => {
       try {
@@ -36,7 +39,10 @@ const SignIn: React.FC = () => {
         // esse abortEarly retorna todos os erros que ele encontra e nao o primeiro erro que encontar
         await schema.validate(data, { abortEarly: false });
 
-        signIn();
+        signIn({
+          email: data.email,
+          password: data.password,
+        });
       } catch (err) {
         const errors = getValidationErros(err);
         formRef.current?.setErrors(errors);

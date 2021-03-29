@@ -25,7 +25,9 @@
   },
   "plugins": ["react", "react-hooks", "@typescript-eslint", "prettier"],
   "rules": {
+    "camelcase":"off",
     "no-unused-vars": "off",
+    "react/react-in-jsx-scope": "off",
     "@typescript-eslint/no-empty-function":"off",
     "no-unused-expressions":"off",
     "no-console": "off",
