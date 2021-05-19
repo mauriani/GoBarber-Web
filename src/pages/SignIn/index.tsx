@@ -28,8 +28,6 @@ const SignIn: React.FC = () => {
   const { addToast } = useToast();
   const history = useHistory();
 
-  console.log(addToast);
-
   // validação de dados, chama a função de signIn passando os campos para realizar auth
   const handleSubmit = useCallback(
     async (data: SignInForm) => {

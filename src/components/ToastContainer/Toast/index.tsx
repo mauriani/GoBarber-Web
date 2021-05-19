@@ -33,10 +33,11 @@ const Toast: React.FC<ToastProps> = ({ message, style }) => {
       clearTimeout(timer);
     };
   }, [message.id, removeToast]);
+
   return (
     <Container
       type={message.type}
-      hasDescription={!!message.description}
+      hasDescription={Number(!!message.description)}
       style={style}
     >
       {icons[message.type || 'info']}
