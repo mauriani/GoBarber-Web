@@ -1,4 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { isToday, format } from 'date-fns';
+import ptBR from 'date-fns/locale/pt-BR';
 import DayPicker, { DayModifiers } from 'react-day-picker';
 import 'react-day-picker/lib/style.css';
 
@@ -25,9 +27,20 @@ interface MonthAvailabilityItem {
   available: boolean;
 }
 
+interface Appointment {
+  id: string;
+  date: string;
+  user: {
+    name: string;
+    avatar_url: string;
+  };
+}
+
 const Dashboard: React.FC = () => {
-  const [selectDate, setSelectDate] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState(new Date());
   const [currentMonth, setCurrentMonth] = useState(new Date());
+
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
 
   const [monthAvailable, setMonthAvailable] = useState<MonthAvailabilityItem[]>(
     [],
@@ -38,7 +51,7 @@ const Dashboard: React.FC = () => {
   const handleDateChange = useCallback((day: Date, modifiers: DayModifiers) => {
     // só muda a seleção do dias entre 1 e 6, ou seja, segunda a sexta.
     if (modifiers.available) {
-      setSelectDate(day);
+      setSelectedDate(day);
     }
   }, []);
 
@@ -61,8 +74,23 @@ const Dashboard: React.FC = () => {
       });
   }, [currentMonth, user.id]);
 
+  // carregar os agendamentos do mês
+  useEffect(() => {
+    api
+      .get(`/appointments/me`, {
+        params: {
+          year: selectedDate.getFullYear(),
+          month: selectedDate.getMonth() + 1,
+          day: selectedDate.getDate(),
+        },
+      })
+      .then(response => {
+        setAppointments(response.data);
+      });
+  }, [selectedDate]);
+
+  // buscas os availables que seja falsos
   const disableDays = useMemo(() => {
-    // buscas os availables que seja falsos
     const dates = monthAvailable
       .filter(monthDay => monthDay.available === false)
       .map(monthDay => {
@@ -74,6 +102,21 @@ const Dashboard: React.FC = () => {
     return dates;
   }, [currentMonth, monthAvailable]);
 
+  // exibi a data formatada dia e mes
+  const selectedDateAsText = useMemo(() => {
+    return format(selectedDate, "'Dia' dd 'de' MMMM", {
+      locale: ptBR,
+    });
+  }, [selectedDate]);
+
+  // exibir o dia da semana header
+  const selectedWeekDay = useMemo(() => {
+    return format(selectedDate, 'cccc', {
+      locale: ptBR,
+    });
+  }, [selectedDate]);
+
+  console.log(appointments);
   return (
     <Container>
       <Header>
@@ -99,9 +142,9 @@ const Dashboard: React.FC = () => {
           <h1>Horários agendados</h1>
 
           <p>
-            <span>Hoje</span>
-            <span>Dia 6</span>
-            <span>Segunda-feira</span>
+            {isToday(selectedDate) && <span>Hoje</span>}
+            <span>{selectedDateAsText}</span>
+            <span>{selectedWeekDay}</span>
           </p>
 
           <NextAppointment>
@@ -168,7 +211,7 @@ const Dashboard: React.FC = () => {
                 daysOfWeek: [1, 2, 3, 4, 5],
               },
             }}
-            selectedDays={selectDate}
+            selectedDays={selectedDate}
             onMonthChange={handleMonthChange}
             onDayClick={handleDateChange}
             months={[
