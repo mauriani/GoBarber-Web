@@ -1,5 +1,5 @@
-import React, { useCallback, useRef } from 'react';
-import { FiArrowLeft, FiCamera, FiLock } from 'react-icons/fi';
+import React, { ChangeEvent, useCallback, useRef } from 'react';
+import { FiArrowLeft, FiCamera, FiLock, FiMail, FiUser } from 'react-icons/fi';
 import { FormHandles } from '@unform/core';
 import { Form } from '@unform/web';
 import * as Yup from 'yup';
@@ -13,6 +13,7 @@ import Button from '../../components/Button';
 import Input from '../../components/Input';
 
 import { Container, Content, AvatarInput } from './styles';
+import api from '../../services/apiClient';
 
 interface ProfileFormDate {
   email: string;
@@ -25,7 +26,7 @@ const Profile: React.FC = () => {
   const { addToast } = useToast();
   const history = useHistory();
 
-  const { user } = useAuth();
+  const { user, updateUser } = useAuth();
 
   // validação de dados, chama a função de signIn passando os campos para realizar auth
   const handleSubmit = useCallback(
@@ -62,6 +63,25 @@ const Profile: React.FC = () => {
     [addToast],
   );
 
+  const handleAvatarChange = useCallback(
+    async (e: ChangeEvent<HTMLInputElement>) => {
+      if (e.target.files) {
+        // na nossa api enviamos o nosso arquivo como multipart
+        const data = new FormData();
+        data.append('avatar', e.target.files[0]);
+
+        api.patch('users/avatar', data).then(response => {
+          updateUser(response.data);
+          addToast({
+            type: 'success',
+            title: 'Avatar atualizado com sucesso',
+          });
+        });
+      }
+    },
+    [addToast, updateUser],
+  );
+
   return (
     <Container>
       <header>
@@ -82,15 +102,17 @@ const Profile: React.FC = () => {
         >
           <AvatarInput>
             <img src={user.avatar_url} alt={user.name} />
-            <button type="button">
+            <label htmlFor="avatar">
               <FiCamera />
-            </button>
+
+              <input type="file" id="avatar" onChange={handleAvatarChange} />
+            </label>
           </AvatarInput>
 
           <h1>Meu perfil</h1>
 
-          <Input name="name" placeholder="name" icon={FiLock} />
-          <Input name="email" placeholder="email" icon={FiLock} />
+          <Input name="name" placeholder="Nome" icon={FiUser} />
+          <Input name="email" placeholder="E-mail" icon={FiMail} />
           <Input
             name="old_password"
             type="password"
