@@ -33,7 +33,7 @@
 
 ```tsx
 #Primeiro Execute o nosso server
-yarn json-server server.json -p 3333
+yarn dev:server
 
 #Start Projeto
 yarn start
