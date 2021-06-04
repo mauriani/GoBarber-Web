@@ -1,6 +1,6 @@
 # GoBarber Web
 
-![image](![image](https://user-images.githubusercontent.com/32397288/120811124-08ac4680-c522-11eb-9c99-7dc929554ddf.png))
+(![image](https://user-images.githubusercontent.com/32397288/120811124-08ac4680-c522-11eb-9c99-7dc929554ddf.png))
 
 ## **🚀 Sobre o projeto**
 
